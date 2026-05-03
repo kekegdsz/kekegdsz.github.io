@@ -1,19 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <!-- Head tag -->
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="keyword"  content="">
+    <meta name="description" content="个人博客，记录技术、项目与日常思考。">
+    <meta name="keyword"  content="博客,技术,随记,Hexo,GitHub Pages">
     <link rel="shortcut icon" href="/img/favicon.ico">
 
     <title>
         
-          
+          珂珂随记 | kekegdsz
         
     </title>
 
@@ -73,7 +72,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">Hexo</a>
+            <a class="navbar-brand" href="/">珂珂随记</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -86,9 +85,23 @@
             <div class="navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
                     <li>
-                        <a href="/">Home</a>
+                        <a href="/">首页</a>
                     </li>
 
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">标签</a>
+                        </li>
+                        
                     
                     
                 </ul>
@@ -130,14 +143,14 @@
 
     <!-- Main Content -->
     <!-- Page Header -->
-<header class="intro-header" style="background-image: url('/')">
+<header class="intro-header" style="background-image: url('/img/home-bg.jpg')">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
                 <div class="site-heading">
-                    <h1>Hexo</h1>
+                    <h1>珂珂随记</h1>
                     <!--<hr class="small">-->
-                    <span class="subheading"></span>
+                    <span class="subheading">学习、项目与日常</span>
                 </div>
             </div>
         </div>
@@ -168,18 +181,19 @@
 
     <a href="/2026/04/30/hello-world/">
         <h2 class="post-title">
-            Hello World
+            博客搭好了
         </h2>
         <h3 class="post-subtitle">
-            
+            从 Hexo 默认欢迎文开始，换成自己的声音
         </h3>
         <div class="post-content-preview">
-            Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub.
-Qu......
+            这篇用来占位：站点已经接好主题与部署流程，接下来我会把内容一点点填起来。
+如果你也在用 Hexo + GitHub Pages，欢迎一起折腾。
+...
         </div>
     </a>
     <p class="post-meta">
-        Posted by John Doe on
+        kekegdsz 发布于
         2026-04-30
     </p>
 
@@ -211,14 +225,30 @@ Qu......
             ">
                 <!-- Featured Tags -->
                 
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">标签</a></h5>
+                    <div class="tags">
+                        
+                            
+                            <a href="/tags/#随记" title="随记" rel="1">随记</a>
+                            
+                        
+                    </div>
+                </section>
+                
 
                 <!-- Short About -->
                 <section class="visible-md visible-lg">
-                    <hr><h5><a href="/about/">ABOUT ME</a></h5>
+                    <hr><h5><a href="/about/">关于我</a></h5>
                     <div class="short-about">
 
                         
+                            <img src="//img/avatar.jpg" />
+                        
 
+                        
+                            <p>写代码、做产品、记生活。</p>
                         
 
                         <!-- SNS Link -->
@@ -231,6 +261,15 @@ Qu......
 
                             
 
+                            
+                                <li>
+                                    <a target="_blank"  href="https://github.com/kekegdsz">
+                                        <span class="fa-stack fa-lg">
+                                            <i class="fa fa-circle fa-stack-2x"></i>
+                                            <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                        </span>
+                                    </a>
+                                </li>
                             
                             
                             
@@ -263,23 +302,27 @@ Qu......
                 
 
                 
+                    <li>
+                        <a target="_blank"  href="https://github.com/kekegdsz">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
 
                 
 
                 </ul>
                 <p class="copyright text-muted">
-                    Copyright &copy; Hexo 2026 
+                    Copyright &copy; 珂珂随记 2026 
                     <br>
-                    Theme by <a target="_blank" rel="noopener" href="http://huangxuan.me">Hux</a> 
+                    Theme by <a target="_blank" rel="noopener" href="http://huangxuan.me">Hux</a>
                     <span style="display: inline-block; margin: 0 5px;">
                         <i class="fa fa-heart"></i>
-                    </span> 
-                    Ported by <a target="_blank" rel="noopener" href="http://blog.kaijun.rocks">Kaijun</a> | 
-                    <iframe
-                        style="margin-left: 2px; margin-bottom:-5px;"
-                        frameborder="0" scrolling="0" width="91px" height="20px"
-                        src="https://ghbtns.com/github-btn.html?user=kaijun&repo=hexo-theme-huxblog&type=star&count=true" >
-                    </iframe>
+                    </span>
+                    Ported by <a target="_blank" rel="noopener" href="https://github.com/Kaijun/hexo-theme-huxblog">Kaijun</a>
                 </p>
             </div>
         </div>

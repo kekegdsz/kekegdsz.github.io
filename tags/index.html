@@ -12,11 +12,11 @@
 
     <title>
         
-          博客搭好了 - 珂珂随记 | kekegdsz
+          标签 - 珂珂随记 | kekegdsz
         
     </title>
 
-    <link rel="canonical" href="https://kekegdsz.github.io/2026/04/30/hello-world/">
+    <link rel="canonical" href="https://kekegdsz.github.io/tags/">
 
     <!-- Bootstrap Core CSS -->
     
@@ -143,138 +143,66 @@
 
     <!-- Main Content -->
     
-<!-- Image to hack wechat -->
-<!-- <img src="https://kekegdsz.github.io/img/icon_wechat.png" width="0" height="0"> -->
-<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
-
-<!-- Post Header -->
-<style type="text/css">
-    header.intro-header{
-        background-image: url('/img/home-bg.jpg')
-    }
-</style>
-<header class="intro-header" >
+<!-- Page Header -->
+<header class="intro-header" style="background-image: url('/img/tag-bg.jpg')">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <div class="post-heading">
-                    <div class="tags">
-                        
-                          <a class="tag" href="/tags/#随记" title="随记">随记</a>
-                        
-                    </div>
-                    <h1>博客搭好了</h1>
-                    <h2 class="subheading">从 Hexo 默认欢迎文开始，换成自己的声音</h2>
-                    <span class="meta">
-                        kekegdsz 发布于
-                        2026-04-30
-                    </span>
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
+                <div class="site-heading">
+                    <h1>标签</h1>
+                    <!--<hr class="small">-->
+                    <span class="subheading">按标签浏览文章。</span>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- Post Content -->
-<article>
-    <div class="container">
-        <div class="row">
-
-    <!-- Post Container -->
-            <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
-                post-container">
-
-                <p>这篇用来占位：站点已经接好主题与部署流程，接下来我会把内容一点点填起来。</p>
-<p>如果你也在用 Hexo + GitHub Pages，欢迎一起折腾。</p>
-
-
-                <hr>
-
+<!-- Main Content -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <!-- 标签云 -->
+            <div id='tag_cloud' class="tags">
                 
-
-                <ul class="pager">
-                    
-                    
-                </ul>
-
+                    <a href="#随记" title="随记" rel="1">随记</a>
                 
-
-                
-
             </div>
-    <!-- Side Catalog Container -->
-        
 
-    <!-- Sidebar Container -->
+            <!-- 标签列表 -->
 
-            <div class="
-                col-lg-8 col-lg-offset-2
-                col-md-10 col-md-offset-1
-                sidebar-container">
-
-                <!-- Featured Tags -->
+            
+            <div class="one-tag-list">
+                <span class="fa fa-tag listing-seperator" id="随记">
+                    <span class="tag-text">随记</span>
+                </span>
                 
-                <section>
-                    <!-- no hr -->
-                    <h5><a href="/tags/">标签</a></h5>
-                    <div class="tags">
-                       
-                          <a class="tag" href="/tags/#随记" title="随记">随记</a>
+                  <!-- <li class="listing-item">
+                  <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
+                  <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
+                  </li> -->
+                 <div class="post-preview">
+                     <a href="/2026/04/30/hello-world/">
+                        <h2 class="post-title">
+                            博客搭好了
+                        </h2>
                         
-                    </div>
-                </section>
-                
-
-                <!-- Friends Blog -->
+                            <h3 class="post-subtitle">
+                                从 Hexo 默认欢迎文开始，换成自己的声音
+                            </h3>
+                        
+                    </a>
+                    <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
+                </div>
+                <hr>
                 
             </div>
+            
+
 
         </div>
     </div>
-</article>
-
-
-
-
-
-
-
-<!-- async load function -->
-<script>
-    function async(u, c) {
-      var d = document, t = 'script',
-          o = d.createElement(t),
-          s = d.getElementsByTagName(t)[0];
-      o.src = u;
-      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
-      s.parentNode.insertBefore(o, s);
-    }
-</script>
-<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
-<script>
-    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
-        anchors.options = {
-          visible: 'always',
-          placement: 'right',
-          icon: '#'
-        };
-        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
-    })
-</script>
-<style>
-    /* place left on bigger screen */
-    @media all and (min-width: 800px) {
-        .anchorjs-link{
-            position: absolute;
-            left: -0.75em;
-            font-size: 1.1em;
-            margin-top : -0.1em;
-        }
-    }
-</style>
-
+</div>
 
 
     <!-- Footer -->
