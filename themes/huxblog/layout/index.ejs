@@ -18,7 +18,7 @@ layout: page
         </div>
     </a>
     <p class="post-meta">
-        Posted by <%- post.author || config.author %> on
+        <%- post.author || config.author %> 发布于
         <%= post.date.format(config.date_format) %>
     </p>
 
@@ -32,12 +32,12 @@ layout: page
 <ul class="pager">
     <% if (page.prev){ %>
         <li class="previous">
-            <a href="<%- config.root %><%- page.prev_link %>">&larr; Newer Posts</a>
+            <a href="<%- config.root %><%- page.prev_link %>">&larr; 较新</a>
         </li>
     <% } %>
     <% if (page.next){ %>
         <li class="next">
-            <a href="<%- config.root %><%- page.next_link %>">Older Posts &rarr;</a>
+            <a href="<%- config.root %><%- page.next_link %>">较早 &rarr;</a>
         </li>
     <% } %>
 </ul>

@@ -1,38 +1,12 @@
 ---
-title: Hello World
+title: 博客搭好了
+subtitle: 从 Hexo 默认欢迎文开始，换成自己的声音
+date: 2026-04-30
+author: kekegdsz
+tags:
+  - 随记
 ---
-Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
 
-## Quick Start
+这篇用来占位：站点已经接好主题与部署流程，接下来我会把内容一点点填起来。
 
-### Create a new post
-
-``` bash
-$ hexo new "My New Post"
-```
-
-More info: [Writing](https://hexo.io/docs/writing.html)
-
-### Run server
-
-``` bash
-$ hexo server
-```
-
-More info: [Server](https://hexo.io/docs/server.html)
-
-### Generate static files
-
-``` bash
-$ hexo generate
-```
-
-More info: [Generating](https://hexo.io/docs/generating.html)
-
-### Deploy to remote sites
-
-``` bash
-$ hexo deploy
-```
-
-More info: [Deployment](https://hexo.io/docs/one-command-deployment.html)
+如果你也在用 Hexo + GitHub Pages，欢迎一起折腾。

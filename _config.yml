@@ -3,17 +3,32 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle: ''
-description: ''
+title: 珂珂随记
+subtitle: 学习、项目与日常
+description: 个人博客，记录技术、项目与日常思考。
 keywords:
-author: John Doe
-language: en
+  - 博客
+  - Hexo
+  - GitHub Pages
+author: kekegdsz
+language: zh-CN
 timezone: ''
+
+# Theme (huxblog) — 与主题模板共用同一套 config 字段
+SEOTitle: 珂珂随记 | kekegdsz
+header-img: img/home-bg.jpg
+keyword: 博客,技术,随记,Hexo,GitHub Pages
+github_username: kekegdsz
+anchorjs: true
+sidebar: true
+sidebar-about-description: 写代码、做产品、记生活。
+sidebar-avatar: /img/avatar.jpg
+featured-tags: true
+featured-condition-size: 0
 
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
-url: http://example.com
+url: https://kekegdsz.github.io
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 pretty_urls:
@@ -101,4 +116,6 @@ theme: huxblog
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
+  type: git
+  repo: git@github.com:kekegdsz/kekegdsz.github.io.git
+  branch: main
