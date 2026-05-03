@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="个人博客，记录技术、项目与日常思考。">
+    <meta name="keyword"  content="博客,技术,随记,Hexo,GitHub Pages">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+          Android 构建优化：从漫长编译到秒级反馈 - keke的博客 | kekegdsz
+        
+    </title>
+
+    <link rel="canonical" href="https://kekegdsz.github.io/2026/01/23/android-build-optimization-git-smart-trim/">
+
+    <!-- Bootstrap Core CSS -->
+    
+<link rel="stylesheet" href="/css/bootstrap.min.css">
+
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/hux-blog.min.css">
+
+
+    <!-- Pygments Highlight CSS -->
+    
+<link rel="stylesheet" href="/css/highlight.css">
+
+
+    <!-- Custom Fonts -->
+    <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet" type="text/css"> -->
+    <!-- Hux change font-awesome CDN to qiniu -->
+    <link href="https://cdn.staticfile.org/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+
+    <!-- Hux Delete, sad but pending in China
+    <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/
+    css'>
+    -->
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 8.0.0"></head>
+
+
+<!-- hack iOS CSS :active style -->
+<body ontouchstart="">
+
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">keke的博客</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <!-- Known Issue, found by Hux:
+            <nav>'s height woule be hold on by its content.
+            so, when navbar scale out, the <nav> will cover tags.
+            also mask any touch event of tags, unfortunately.
+        -->
+        <div id="huxblog_navbar">
+            <div class="navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="/">首页</a>
+                    </li>
+
+                    
+
+                        
+                        <li>
+                            <a href="/tags/">标签</a>
+                        </li>
+                        
+                    
+
+                        
+                        <li>
+                            <a href="/about/">About</a>
+                        </li>
+                        
+                    
+                    
+                </ul>
+            </div>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<script>
+    // Drop Bootstarp low-performance Navbar
+    // Use customize navbar with high-quality material design animation
+    // in high-perf jank-free CSS3 implementation
+    var $body   = document.body;
+    var $toggle = document.querySelector('.navbar-toggle');
+    var $navbar = document.querySelector('#huxblog_navbar');
+    var $collapse = document.querySelector('.navbar-collapse');
+
+    $toggle.addEventListener('click', handleMagic)
+    function handleMagic(e){
+        if ($navbar.className.indexOf('in') > 0) {
+        // CLOSE
+            $navbar.className = " ";
+            // wait until animation end.
+            setTimeout(function(){
+                // prevent frequently toggle
+                if($navbar.className.indexOf('in') < 0) {
+                    $collapse.style.height = "0px"
+                }
+            },400)
+        }else{
+        // OPEN
+            $collapse.style.height = "auto"
+            $navbar.className += " in";
+        }
+    }
+</script>
+
+
+    <!-- Main Content -->
+    
+<!-- Image to hack wechat -->
+<!-- <img src="https://kekegdsz.github.io/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        background-image: url('/img/home-bg.jpg')
+    }
+</style>
+<header class="intro-header" >
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                          <a class="tag" href="/tags/#Android" title="Android">Android</a>
+                        
+                          <a class="tag" href="/tags/#Gradle" title="Gradle">Gradle</a>
+                        
+                          <a class="tag" href="/tags/#构建优化" title="构建优化">构建优化</a>
+                        
+                    </div>
+                    <h1>Android 构建优化：从漫长编译到秒级反馈</h1>
+                    <h2 class="subheading">智能任务裁剪与 Git 状态感知</h2>
+                    <span class="meta">
+                        kekegdsz 发布于
+                        2026-01-23
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+                <blockquote>
+<p>本文首发于 <a target="_blank" rel="noopener" href="https://juejin.cn/post/7598376873546956843">掘金</a>，欢迎转载时注明原文链接。</p>
+</blockquote>
+<p>如何让 Gradle 自动感知代码变更，只编译真正需要修改的模块？下面是一套<strong>基于 Git 状态感知的智能构建优化</strong>思路与实践要点。</p>
+<h2 id="前言：构建慢的痛点"><a href="#前言：构建慢的痛点" class="headerlink" title="前言：构建慢的痛点"></a>前言：构建慢的痛点</h2><p>「又卡在编译了…」相信每个 Android 开发者都经历过这样的时刻。随着项目规模增长，每次只改几行代码却要等待漫长的全量编译，效率会明显下降。</p>
+<p>传统增量编译有帮助，但在多模块项目里仍有很大优化空间。本文分享一套让 Gradle <strong>尽量只编译变更相关模块</strong>的方案思路。</p>
+<h2 id="一、原理分析"><a href="#一、原理分析" class="headerlink" title="一、原理分析"></a>一、原理分析</h2><h3 id="1-1-传统构建的瓶颈"><a href="#1-1-传统构建的瓶颈" class="headerlink" title="1.1 传统构建的瓶颈"></a>1.1 传统构建的瓶颈</h3><p>即使启用了增量编译，Gradle 仍可能：</p>
+<ul>
+<li>执行 lint</li>
+<li>运行单元测试</li>
+<li>处理所有模块的资源编译</li>
+<li>执行 kapt &#x2F; ksp 等注解处理</li>
+</ul>
+<h3 id="1-2-优化思路概览"><a href="#1-2-优化思路概览" class="headerlink" title="1.2 优化思路概览"></a>1.2 优化思路概览</h3><ol>
+<li><strong>Git 状态感知</strong>：识别仓库相对上次构建是否有「实质性」变更  </li>
+<li><strong>任务裁剪</strong>：在可控前提下跳过与当前开发无关的任务  </li>
+<li><strong>失败回退</strong>：裁剪导致失败时，下次回到更保守的策略  </li>
+<li><strong>通用编译优化</strong>：Kotlin &#x2F; Java &#x2F; 测试并行等全局提速</li>
+</ol>
+<p>整体可抽象为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">├── Git 状态监控层（HEAD / 分支等）</span><br><span class="line">├── 任务裁剪层（过滤非必需任务、识别变更模块）</span><br><span class="line">├── 编译优化层（Kotlin/Java/测试并行、资源等）</span><br><span class="line">└── 容错控制层（失败标记、自动回退）</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、实现要点（节选）"><a href="#二、实现要点（节选）" class="headerlink" title="二、实现要点（节选）"></a>二、实现要点（节选）</h2><h3 id="2-1-Git-状态初始化（建议只做一次）"><a href="#2-1-Git-状态初始化（建议只做一次）" class="headerlink" title="2.1 Git 状态初始化（建议只做一次）"></a>2.1 Git 状态初始化（建议只做一次）</h3><p>在根工程脚本中维护全局标记，避免重复执行昂贵命令：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">ext._gitHeadChanged = <span class="literal">false</span></span><br><span class="line">ext._gitBranchChanged = <span class="literal">false</span></span><br><span class="line">ext._gitStateInited = <span class="literal">false</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> initGitStateOnce = &#123;</span><br><span class="line">    <span class="keyword">if</span> (rootProject.ext._gitStateInited) <span class="keyword">return</span></span><br><span class="line">    rootProject.ext._gitStateInited = <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 读取当前 HEAD，与持久化文件对比（示意）</span></span><br><span class="line">    <span class="keyword">def</span> currentHead = executeGitCommand(<span class="string">&quot;git rev-parse HEAD&quot;</span>)</span><br><span class="line">    <span class="keyword">def</span> lastHead = readLastState(<span class="string">&quot;last_git_head.txt&quot;</span>)</span><br><span class="line"></span><br><span class="line">    rootProject.ext._gitHeadChanged =</span><br><span class="line">        lastHead &amp;&amp; lastHead != currentHead</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要点：</p>
+<ul>
+<li>用 <code>ext</code> 做单次初始化控制  </li>
+<li>异常时宁可「认为有变更」，避免静默跳过必要编译  </li>
+<li>状态可落在 <code>build/</code> 下本地文件，勿提交敏感信息</li>
+</ul>
+<h3 id="2-2-通用编译优化（全工程）"><a href="#2-2-通用编译优化（全工程）" class="headerlink" title="2.2 通用编译优化（全工程）"></a>2.2 通用编译优化（全工程）</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">allprojects &#123; Project p -&gt;</span><br><span class="line">    afterEvaluate &#123;</span><br><span class="line">        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach &#123; task -&gt;</span><br><span class="line">            task.kotlinOptions &#123;</span><br><span class="line">                jvmTarget = <span class="string">&quot;1.8&quot;</span></span><br><span class="line">                freeCompilerArgs += [<span class="string">&quot;-Xjsr305=strict&quot;</span>]</span><br><span class="line">                suppressWarnings = <span class="literal">true</span></span><br><span class="line">            &#125;</span><br><span class="line">            task.incremental = <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        tasks.withType(JavaCompile).configureEach &#123;</span><br><span class="line">            options.incremental = <span class="literal">true</span></span><br><span class="line">            options.fork = <span class="literal">true</span></span><br><span class="line">            options.forkOptions.memoryMaximumSize = <span class="string">&quot;1g&quot;</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        tasks.withType(Test).configureEach &#123;</span><br><span class="line">            maxParallelForks = (Runtime.runtime.availableProcessors().intdiv(<span class="number">2</span>)) ?: <span class="number">1</span></span><br><span class="line">            forkEvery = <span class="number">100</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Android 资源侧还可按需关闭 PNG crunch 等（视团队规范而定）。</p>
+<h3 id="2-3-智能任务裁剪"><a href="#2-3-智能任务裁剪" class="headerlink" title="2.3 智能任务裁剪"></a>2.3 智能任务裁剪</h3><p>在 <code>gradle.taskGraph.whenReady</code> 中：</p>
+<ul>
+<li>仅在你关心的生命周期（例如 <code>assemble*</code>）里做裁剪  </li>
+<li>根据 <code>_gitHeadChanged</code>、上次裁剪是否失败等，决定是否允许裁剪  </li>
+<li>对 <code>lint</code>、<code>test</code>、<code>connectedAndroidTest</code> 等任务按需 <code>enabled = false</code>  </li>
+<li>通过 <code>git diff</code> 解析变更文件路径，映射到 Gradle 子工程路径，再对<strong>未变更模块</strong>的 <code>compileDebug*</code> &#x2F; <code>kaptDebug*</code> &#x2F; <code>kspDebug*</code> 等任务选择性关闭</li>
+</ul>
+<p>伪代码逻辑：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">gradle.taskGraph.whenReady &#123; graph -&gt;</span><br><span class="line">    initGitStateOnce()</span><br><span class="line">    <span class="keyword">if</span> (!graph.allTasks.any &#123; it.name.startsWith(<span class="string">&quot;assemble&quot;</span>) &#125;) <span class="keyword">return</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> allowTaskTrim = !lastTrimFailed &amp;&amp;</span><br><span class="line">        !rootProject.ext._gitHeadChanged &amp;&amp;</span><br><span class="line">        !rootProject.ext._gitBranchChanged</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据 allowTaskTrim 与 changedModules 调整 task.enabled ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4-容错与回退"><a href="#2-4-容错与回退" class="headerlink" title="2.4 容错与回退"></a>2.4 容错与回退</h3><ul>
+<li>构建开始前写入「本次可能失败」标记  </li>
+<li><code>gradle.buildFinished</code> 里根据 <code>result.failure</code> 清理或保留标记  </li>
+<li>一旦失败，下次构建自动走全量或保守路径，避免长期处在错误裁剪状态</li>
+</ul>
+<h2 id="三、使用方式"><a href="#三、使用方式" class="headerlink" title="三、使用方式"></a>三、使用方式</h2><p>在根目录 <code>build.gradle</code> 或 <code>settings.gradle</code> 中：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="attr">from:</span> <span class="string">&#x27;build-optimization.gradle&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>可按项目调整：是否启用智能裁剪、<code>skipTasks</code> 列表、测试并行度、Kotlin 参数等。</p>
+<p>构建时建议打印简短决策日志，便于排查「为何本次没裁剪 &#x2F; 裁多了」。</p>
+<h2 id="四、效果预期（量级参考）"><a href="#四、效果预期（量级参考）" class="headerlink" title="四、效果预期（量级参考）"></a>四、效果预期（量级参考）</h2><p>原文在约 10 模块、约 20 万行业务代码的测试工程中的对比（<strong>实际以你机器与工程为准</strong>）：</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>传统构建</th>
+<th>优化后</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>单模块小改动</td>
+<td>~45s</td>
+<td>~12s</td>
+<td>明显缩短</td>
+</tr>
+<tr>
+<td>跨模块 API 变更</td>
+<td>~52s</td>
+<td>~52s</td>
+<td>不宜过度裁剪</td>
+</tr>
+<tr>
+<td>Clean 后全量</td>
+<td>~68s</td>
+<td>~68s</td>
+<td>与全量一致</td>
+</tr>
+<tr>
+<td>日常迭代</td>
+<td>~38s</td>
+<td>~15s</td>
+<td>体感提升大</td>
+</tr>
+</tbody></table>
+<p>环境参考：MacBook Pro M1、16GB RAM、Gradle 7.4（升级 AGP&#x2F;Gradle 后行为会变化，需重新摸底）。</p>
+<hr>
+<p><strong>相关仓库（原文提及）</strong>：可在掘金原文中查看项目链接与完整脚本；落地到你们仓库前务必在 CI 与本地多场景验证，避免跳过必要任务导致「偶现编译通过、运行失败」。</p>
+
+
+                <hr>
+
+                
+
+                <ul class="pager">
+                    
+                        <li class="previous">
+                            <a href="/2026/04/30/hello-world/" data-toggle="tooltip" data-placement="top" title="博客搭好了">&larr; Previous Post</a>
+                        </li>
+                    
+                    
+                </ul>
+
+                
+
+                
+
+            </div>
+    <!-- Side Catalog Container -->
+        
+
+    <!-- Sidebar Container -->
+
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
+
+                <!-- Featured Tags -->
+                
+                <section>
+                    <!-- no hr -->
+                    <h5><a href="/tags/">标签</a></h5>
+                    <div class="tags">
+                       
+                          <a class="tag" href="/tags/#Android" title="Android">Android</a>
+                        
+                          <a class="tag" href="/tags/#Gradle" title="Gradle">Gradle</a>
+                        
+                          <a class="tag" href="/tags/#构建优化" title="构建优化">构建优化</a>
+                        
+                    </div>
+                </section>
+                
+
+                <!-- Friends Blog -->
+                
+            </div>
+
+        </div>
+    </div>
+</article>
+
+
+
+
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("https://cdn.bootcss.com/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
+
+    <!-- Footer -->
+    <!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                
+                
+                
+
+                
+
+                
+
+                
+                    <li>
+                        <a target="_blank"  href="https://github.com/kekegdsz">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+
+                </ul>
+                <p class="copyright text-muted">
+                    Copyright &copy; keke的博客 2026 
+                    <br>
+                    Theme by <a target="_blank" rel="noopener" href="http://huangxuan.me">Hux</a>
+                    <span style="display: inline-block; margin: 0 5px;">
+                        <i class="fa fa-heart"></i>
+                    </span>
+                    Ported by <a target="_blank" rel="noopener" href="https://github.com/Kaijun/hexo-theme-huxblog">Kaijun</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+
+<script src="/js/jquery.min.js"></script>
+
+
+<!-- Bootstrap Core JavaScript -->
+
+<script src="/js/bootstrap.min.js"></script>
+
+
+<!-- Custom Theme JavaScript -->
+
+<script src="/js/hux-blog.min.js"></script>
+
+
+
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+
+<!-- 
+     Because of the native support for backtick-style fenced code blocks 
+     right within the Markdown is landed in Github Pages, 
+     From V1.6, There is no need for Highlight.js, 
+     so Huxblog drops it officially.
+
+     - https://github.com/blog/2100-github-pages-now-faster-and-simpler-with-jekyll-3-0  
+     - https://help.github.com/articles/creating-and-highlighting-code-blocks/    
+-->
+<!--
+    <script>
+        async("http://cdn.bootcss.com/highlight.js/8.6/highlight.min.js", function(){
+            hljs.initHighlightingOnLoad();
+        })
+    </script>
+    <link href="http://cdn.bootcss.com/highlight.js/8.6/styles/github.min.css" rel="stylesheet">
+-->
+
+
+<!-- jquery.tagcloud.js -->
+<script>
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("https://kekegdsz.github.io/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+</script>
+
+<!--fastClick.js -->
+<script>
+    async("https://cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+        var $nav = document.querySelector("nav");
+        if($nav) FastClick.attach($nav);
+    })
+</script>
+
+
+<!-- Google Analytics -->
+
+
+
+
+<!-- Baidu Tongji -->
+
+
+<!-- Side Catalog -->
+
+
+
+
+
+<!-- Image to hack wechat -->
+<img src="https://kekegdsz.github.io/img/icon_wechat.png" width="0" height="0" />
+<!-- Migrate from head to bottom, no longer block render and still work -->
+
+</body>
+
+</html>
